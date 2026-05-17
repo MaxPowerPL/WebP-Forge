@@ -9,7 +9,7 @@
   *Konwertuj pojedyncze pliki, całe foldery i partię plików – szybko, wielowątkowo i z pełną kontrolą jakości.*
 
   <p>
-    <a href="https://github.com/MaxPowerPL/webp-forge/releases/tag/v1.0.0">
+    <a href="https://github.com/MaxPowerPL/WebP-Forge/releases/tag/v1.0.0">
       <img src="https://img.shields.io/github/v/tag/MaxPowerPL/webp-forge?label=VERSION&style=for-the-badge&color=238636" alt="Wersja" />
     </a>
     <a href="#">
