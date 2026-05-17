@@ -1,0 +1,16 @@
+# WebP Forge – zależności Python
+# Testowane z Python 3.12.5 na Windows 11
+
+# GUI
+customtkinter==5.2.2
+
+# Konwersja obrazów PNG → WebP
+# Pillow dostarcza wbudowany libwebp (w kołach dla Windows) – brak dodatkowych binarnych zależności
+Pillow==10.4.0
+
+# Drag & drop (opcjonalnie – komentarz: wymaga tkinterdnd2 i TkinterDnD2)
+# Odkomentuj i zainstaluj ręcznie jeśli chcesz drag & drop:
+# tkinterdnd2==0.3.0
+
+# Pakowanie do .exe
+pyinstaller==6.11.1
