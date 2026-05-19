@@ -1,5 +1,5 @@
 """
-Serwis skanowania plików PNG z katalogu (rekurencyjnie).
+Serwis skanowania plików obrazów (PNG, JPG/JPEG) z katalogu (rekurencyjnie).
 """
 from __future__ import annotations
 
@@ -7,27 +7,33 @@ import logging
 from pathlib import Path
 from typing import List
 
+from app.config.constants import SUPPORTED_EXTENSIONS
+
 logger = logging.getLogger(__name__)
 
 
-def scan_png_files(source: Path) -> List[Path]:
+def scan_image_files(source: Path) -> List[Path]:
     """
-    Zwraca listę plików PNG z podanej ścieżki.
-    Jeśli source to plik – zwraca listę jednoelementową.
+    Zwraca listę obsługiwanych plików obrazów (PNG, JPG/JPEG) z podanej ścieżki.
+    Jeśli source to plik – zwraca listę jednoelementową (jeśli format obsługiwany).
     Jeśli source to katalog – skanuje rekurencyjnie.
     """
     if not source.exists():
         return []
     if source.is_file():
-        if source.suffix.lower() == ".png":
+        if source.suffix.lower() in SUPPORTED_EXTENSIONS:
             return [source]
         return []
     results: List[Path] = []
-    for p in sorted(source.rglob("*.png")):
-        if p.is_file():
+    for p in sorted(source.rglob("*")):
+        if p.is_file() and p.suffix.lower() in SUPPORTED_EXTENSIONS:
             results.append(p)
-    logger.info("Znaleziono %d plików PNG w: %s", len(results), source)
+    logger.info("Znaleziono %d plików obrazów w: %s", len(results), source)
     return results
+
+
+# Alias wstecznej kompatybilności (używany w conversion_controller)
+scan_png_files = scan_image_files
 
 
 def resolve_output_path(

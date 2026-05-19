@@ -5,7 +5,10 @@ WebP Forge – stałe konfiguracyjne aplikacji.
 APP_NAME = "WebP Forge"
 APP_VERSION = "1.0.0"
 APP_AUTHOR = "MaxPowerPL"
-APP_DESCRIPTION = "Zaawansowany konwerter PNG → WebP"
+APP_DESCRIPTION = "Zaawansowany konwerter PNG/JPG → WebP"
+
+# ─── Obsługiwane formaty wejściowe ────────────────────────────────────────────
+SUPPORTED_EXTENSIONS: tuple[str, ...] = (".png", ".jpg", ".jpeg")
 GITHUB_URL = "https://github.com/MaxPowerPL/webp-forge"
 
 # ─── Ścieżki danych ────────────────────────────────────────────────────────────

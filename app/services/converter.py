@@ -1,5 +1,5 @@
 """
-Silnik konwersji PNG → WebP oparty na Pillow.
+Silnik konwersji PNG/JPG → WebP oparty na Pillow.
 
 Wybór biblioteki: Pillow (PIL Fork)
 - Najdojrzalsze, stabilne wsparcie WebP na Windows.
@@ -8,6 +8,10 @@ Wybór biblioteki: Pillow (PIL Fork)
 - Brak dodatkowych binarnych zależności – webp obsługiwany przez wbudowany
   backend libwebp dołączany do kół Pillow dla Windows.
 - Alternatywy (opencv-python, imageio) dodają ~50 MB overhead bez korzyści.
+
+Obsługiwane formaty wejściowe: PNG, JPG/JPEG.
+- PNG z przezroczystością (RGBA/PA/LA) → WebP zachowuje alpha.
+- JPG nie ma kanału alpha → zawsze konwertowany do RGB.
 """
 from __future__ import annotations
 
@@ -20,15 +24,21 @@ from app.models.conversion_job import ConversionJob, JobStatus
 
 logger = logging.getLogger(__name__)
 
+# Formaty, w których przezroczystość jest możliwa i powinna być zachowana
+_ALPHA_MODES = {"RGBA", "PA", "LA"}
+# Formaty paletowe – mogą zawierać transparency chunk w PNG
+_PALETTE_MODES = {"P"}
 
-def convert_png_to_webp(job: ConversionJob) -> ConversionJob:
+
+def convert_to_webp(job: ConversionJob) -> ConversionJob:
     """
-    Konwertuje pojedynczy plik PNG na WebP.
+    Konwertuje pojedynczy plik PNG lub JPG/JPEG na WebP.
     Modyfikuje job.status oraz rozmiary w miejscu i zwraca job.
     Nie rzuca wyjątków – błędy trafiają do job.error_message.
     """
     source = job.source_path
     output = job.output_path
+    ext = source.suffix.lower()
 
     try:
         job.source_size_bytes = source.stat().st_size
@@ -40,11 +50,19 @@ def convert_png_to_webp(job: ConversionJob) -> ConversionJob:
 
         img: Image.Image = Image.open(source)
 
-        # Zachowaj przezroczystość (PNG może mieć RGBA, P+transparency, LA)
-        if img.mode in ("P", "LA"):
-            img = img.convert("RGBA")
-        elif img.mode not in ("RGBA", "RGB"):
-            img = img.convert("RGB")
+        if ext in (".jpg", ".jpeg"):
+            # JPEG nie obsługuje przezroczystości – zawsze RGB
+            if img.mode != "RGB":
+                img = img.convert("RGB")
+        else:
+            # PNG – zachowaj przezroczystość gdzie to możliwe
+            if img.mode in _PALETTE_MODES:
+                # Paleta może mieć transparency chunk → konwertuj do RGBA
+                img = img.convert("RGBA")
+            elif img.mode == "LA":
+                img = img.convert("RGBA")
+            elif img.mode not in _ALPHA_MODES and img.mode != "RGB":
+                img = img.convert("RGB")
 
         save_kwargs: dict = {}
         if job.mode == "lossless":
@@ -86,3 +104,7 @@ def convert_png_to_webp(job: ConversionJob) -> ConversionJob:
         logger.error("Błąd konwersji %s: %s", source, exc)
 
     return job
+
+
+# Alias wstecznej kompatybilności
+convert_png_to_webp = convert_to_webp

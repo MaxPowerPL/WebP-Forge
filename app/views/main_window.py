@@ -115,7 +115,7 @@ class MainWindow(ctk.CTk):
 
         ctk.CTkLabel(
             header,
-            text="Konwerter PNG → WebP  ·  szybko, bezstratnie lub stratnie",
+            text="Konwerter PNG/JPG → WebP  ·  szybko, bezstratnie lub stratnie",
             font=ctk.CTkFont(family="Segoe UI", size=11),
             text_color=C_TEXT_DIM,
         ).grid(row=0, column=2, sticky="e", padx=20)
@@ -468,9 +468,14 @@ class MainWindow(ctk.CTk):
     def _pick_file(self) -> None:
         init = self._settings.last_input_path or str(Path.home())
         path = filedialog.askopenfilename(
-            title="Wybierz plik PNG",
+            title="Wybierz plik PNG lub JPG",
             initialdir=init,
-            filetypes=[("PNG", "*.png"), ("Wszystkie pliki", "*.*")],
+            filetypes=[
+                ("Obrazy (PNG, JPG)", "*.png *.jpg *.jpeg"),
+                ("PNG", "*.png"),
+                ("JPG / JPEG", "*.jpg *.jpeg"),
+                ("Wszystkie pliki", "*.*"),
+            ],
         )
         if path:
             self._set_sources([Path(path)])
@@ -479,9 +484,14 @@ class MainWindow(ctk.CTk):
     def _pick_files(self) -> None:
         init = self._settings.last_input_path or str(Path.home())
         paths = filedialog.askopenfilenames(
-            title="Wybierz pliki PNG",
+            title="Wybierz pliki PNG lub JPG",
             initialdir=init,
-            filetypes=[("PNG", "*.png"), ("Wszystkie pliki", "*.*")],
+            filetypes=[
+                ("Obrazy (PNG, JPG)", "*.png *.jpg *.jpeg"),
+                ("PNG", "*.png"),
+                ("JPG / JPEG", "*.jpg *.jpeg"),
+                ("Wszystkie pliki", "*.*"),
+            ],
         )
         if paths:
             self._set_sources([Path(p) for p in paths])
@@ -489,7 +499,7 @@ class MainWindow(ctk.CTk):
 
     def _pick_folder(self) -> None:
         init = self._settings.last_input_path or str(Path.home())
-        path = filedialog.askdirectory(title="Wybierz folder z plikami PNG", initialdir=init)
+        path = filedialog.askdirectory(title="Wybierz folder z plikami PNG/JPG", initialdir=init)
         if path:
             self._set_sources([Path(path)])
             self._settings.last_input_path = path
@@ -524,7 +534,7 @@ class MainWindow(ctk.CTk):
             return
 
         if not self._source_paths:
-            messagebox.showwarning("Brak źródeł", "Wybierz co najmniej jeden plik lub folder PNG.")
+            messagebox.showwarning("Brak źródeł", "Wybierz co najmniej jeden plik lub folder PNG/JPG.")
             return
         if not self._output_path:
             messagebox.showwarning("Brak celu", "Wybierz katalog wyjściowy.")
